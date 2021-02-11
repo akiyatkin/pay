@@ -1,0 +1,12 @@
+{
+    "name": "akiyatkin/pay",
+    "require":{
+        "akiyatkin/meta":"~1",
+        "infrajs/lang":"~1"
+    },
+    "autoload":{
+        "psr-4":{
+            "akiyatkin\\pay\\":"/"
+        }
+    }
+}
