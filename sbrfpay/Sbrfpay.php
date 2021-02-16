@@ -91,6 +91,9 @@ class Sbrfpay {
 		if ($info['orderStatus'] == 2) $info['result'] = 1;
 		else $info['result'] = 0;
 
+		$info['error'] = '';
+		if (isset($info['actionCodeDescription'])) $info['error'] = $info['actionCodeDescription'];
+		
 		$testres = array_intersect_key($info, array_flip(Pay::$infoprops));
 		if (sizeof($testres) != sizeof(Pay::$infoprops)) return false;
 		return $info;

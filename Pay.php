@@ -5,7 +5,7 @@ use infrajs\db\Db;
 use infrajs\cache\CacheOnce;
 
 class Pay {
-	public static $infoprops = ['total','orderId','formUrl','date','order_nick','result','description'];
+	public static $infoprops = ['total','orderId','formUrl','date','order_nick','result','description','error'];
 	public static $conf = [];
 	public static $name = 'pay';
 	use CacheOnce;

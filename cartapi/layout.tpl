@@ -29,13 +29,15 @@
 		<a href="/cart/orders/{data.id}">Данные заказа</a><br>
 		<a href="/cart/orders/{data.id}/list">Корзина</a>
 	</p> -->
-{INFO:}
+{INFO:}	
 	{result?:good?:bad}
-	{bad:}<div class="alert alert-success">{actionCodeDescription}</div>
+	<p>{description}</p>
+	{bad:}
+		<p>Не оплачен</p>
+		<div class="alert alert-success">{error}</div>
 	{good:}
-		<p>{description}</p>
 		<table style="width:auto" class="table table-sm table-striped">
-			<tr><th>Оплачено</th><td>{~date(:d.m.Y H:i,date)}</td></tr>
+			<tr><th>Оплачен</th><td>{~date(:d.m.Y H:i,date)}</td></tr>
 			<tr><th>Сумма</th><td>{~cost(total)}{:model.unit}</td></tr>
 		</table>
 {DESCR:}
