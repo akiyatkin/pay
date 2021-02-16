@@ -1,0 +1,10 @@
+{
+	"error":"Error {payload}",
+	"guest":"Authorization required",
+	"needpay":"An incompatible payment method is selected",
+	"order404":"Order not found",
+	"needstatuspay":"Invalid order status",
+	"needtotal":"Missing the total cost of the order",
+	"erconnect":"Connection error",
+	"dbfail":"Database error"
+}

@@ -1,0 +1,18 @@
+{
+	"tpl":"-cart/paykeeper/layout.tpl",
+	"jsontpl":"-cart/sbrfpay/?order_nick={crumb.parent.name}&place={crumb.parent.parent.name}&lang={Cart.lang()}&token={User.token()}",
+	"tpl":"-cart/sbrfpay/layout.tpl",
+	"childs":{
+		"success":{
+			"tpl":"-pay/layout.tpl",
+			"tplroot":"SUCCESS",
+			"jsontpl":"-pay/cartapi/success?order_nick={crumb.parent.parent.name}&place={crumb.parent.parent.parent.name}&orderid={Crumb.get.orderId}&lang={Cart.lang()}&token={User.token()}",
+			"jsontpl2":"-cart/sbrfpay/?order_nick={crumb.parent.parent.name}&place={crumb.parent.parent.parent.name}&orderId={Crumb.get.orderId}&status=success&lang={Cart.lang()}&token={User.token()}"
+		},
+		"error":{
+			"tpl":"-cart/sbrfpay/layout.tpl",
+			"tplroot":"ERROR",
+			"jsontpl":"-cart/sbrfpay/?order_nick={crumb.parent.parent.name}&place={crumb.parent.parent.parent.name}}&orderId={Crumb.get.orderId}&status=error&lang={Cart.lang()}&token={User.token()}"
+		}
+	}
+}

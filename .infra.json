@@ -1,6 +1,19 @@
 {
+	"conf":"akiyatkin\\pay\\Pay",
+	"bank":"sbrfpay",
 	"lang":{
 		"def":"ru",
 		"list":["ru","en"]
+	},
+	"sbrfpay":{
+		"server":"https://3dsec.sberbank.ru",
+		"userName":"",
+		"password":""
+	},
+	"paykeeper":{		
+		"secret":"",
+		"userName":"",
+		"password":"",
+		"server":"demo.server.paykeeper.ru"
 	}
 }
