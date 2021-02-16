@@ -1,5 +1,7 @@
 {
+	"nomail":"Failed to send email",
 	"error":"Error {payload}",
+	"bankerror":"Payment error",
 	"guest":"Authorization required",
 	"needpay":"An incompatible payment method is selected",
 	"order404":"Order not found",

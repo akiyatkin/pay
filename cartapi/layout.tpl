@@ -8,14 +8,14 @@
 	{:links}
 {ERROR:}
 	{(:Ошибка при оплате):utilcrumb}
-	<h1>Заказ {data.id}</h1>
+	<h1>Ошибка при оплате</h1>
 	{data.msg?data:ans.msg}
-	{data.order:INFO}
+	{data.info:INFO}
 	{:links}
 {utilcrumb:}
 	<ol class="breadcrumb">
-		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
-		<li class="breadcrumb-item"><a href="/cart/{data.place}/{data.order.id|:my}">Оформление заказа {data.order.id}</a></li>
+		<li class="breadcrumb-item"><a class="{data.user.admin?:text-danger}" href="/cart">Личный кабинет</a></li>
+		<li class="breadcrumb-item"><a href="/cart/orders/{data.info.order_nick|:active}">Оформление заказа {data.order.id}</a></li>
 		<li class="breadcrumb-item active">{.}</li>
 	</ol>
 {redirect:}
@@ -31,11 +31,11 @@
 	</p> -->
 {INFO:}
 	{result?:good?:bad}
-	{bad:}<div class="alert alert-success">{actionCodeDescription}</div>
+	{bad:}<div class="alert alert-success">{error}</div>
 	{good:}
 		<p>{description}</p>
 		<table style="width:auto" class="table table-sm table-striped">
-			<tr><th>Оплачено</th><td>{~date(:d.m.Y H:i,date)}</td></tr>
+			<tr><th>Оплачен</th><td>{~date(:d.m.Y H:i,date)}</td></tr>
 			<tr><th>Сумма</th><td>{~cost(total)}{:model.unit}</td></tr>
 		</table>
 {DESCR:}

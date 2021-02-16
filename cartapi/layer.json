@@ -1,16 +1,16 @@
 {
-	"jsontpl2":"-cart/sbrfpay/?order_nick={crumb.parent.name}&place={crumb.parent.parent.name}&lang={Cart.lang()}&token={User.token()}",
-	"tpl2":"-cart/sbrfpay/layout.tpl",
+	"jsontpl":"-cart/cartapi/pay?order_nick={crumb.parent.name}&place={crumb.parent.parent.name}&lang={Cart.lang()}&token={User.token()}",
+	"tpl":"-pay/cartapi/layout.tpl",
 	"childs":{
 		"success":{
 			"tpl":"-pay/cartapi/layout.tpl",
 			"tplroot":"SUCCESS",
-			"jsontpl":"-pay/cartapi/success?order_nick={crumb.parent.parent.name}&place={crumb.parent.parent.parent.name}&orderid={Crumb.get.orderId}&lang={Cart.lang()}&token={User.token()}"
+			"jsontpl":"-pay/cartapi/info?status=success&order_nick={crumb.parent.parent.name}&place={crumb.parent.parent.parent.name}&orderid={Crumb.get.orderId}&lang={Cart.lang()}&token={User.token()}"
 		},
 		"error":{
-			"tpl":"-cart/cartapi/layout.tpl",
+			"tpl":"-pay/cartapi/layout.tpl",
 			"tplroot":"ERROR",
-			"jsontpl":"-pay/cartapi/error?order_nick={crumb.parent.parent.name}&place={crumb.parent.parent.parent.name}&orderid={Crumb.get.orderId}&lang={Cart.lang()}&token={User.token()}"
+			"jsontpl":"-pay/cartapi/info?status=error&order_nick={crumb.parent.parent.name}&place={crumb.parent.parent.parent.name}&orderid={Crumb.get.orderId}&lang={Cart.lang()}&token={User.token()}"
 		}
 	}
 }

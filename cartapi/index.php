@@ -17,23 +17,34 @@ $meta = new Meta();
 
 $meta->addArgument('token');
 $meta->addArgument('order_nick');
+
+$meta->addArgument('status', function ($status) {
+	if (in_array($status, ['success','error'])) {		
+		return $status;
+	} else {
+		return $this->fail('meta.required','status');
+	}
+});
 $meta->addArgument('orderid'); //Банковский orderId
 $meta->addArgument('place', function ($place) {
-	if (in_array($place, ['admin','orders'])) {
+	if (in_array($place, ['admin','orders'])) {		
 		return $place;
 	} else {
-		return $this->fail('meta.requrired','place');
+		return $this->fail('meta.required','place');
 	}
 });
 $meta->addVariable('order*', function () {
 	extract($this->gets(['order_nick','user*','place']));
 	$order = Cart::getByNick($order_nick);
 	if (!$order) return $this::fail('order404');
+	
 	if ($place == 'admin' && !$user['admin']
 		|| $place == 'orders' && !Cart::isOwner($order['order_id'], $user['user_id'])
 	) return $this->err('meta.forbidden');
+
 	if ($order['pay'] != 'card') return $this->fail('needpay');
-	if ($order['status'] != 'pay') return $this->fail('needstatuspay');
+
+	if (!in_array($order['status'], ['pay','check'])) return $this->fail('needstatuspay');
 	if (!$order['total']) return $this->fail('needtotal');
 	$ans['order'] = $order;
 	return $order;
@@ -49,36 +60,51 @@ $meta->addVariable('user*', function () {
 
 $meta->addAction('infofromorder', function () {
 	extract($this->gets(['order*']));
-	$info = $order['paydata'];
-	$this->ans['info'] = array_intersect_key($info, array_flip(Pay::$infoprops));
+	$this->ans['info'] = $order['paydata'];
 	return $this->ret();
 });
 
-$meta->addAction('success', function () { 
+$meta->addAction('info', function () { 
 	//Страница с сообщением об успешной оплате по редиректу с банка
-	$info = $this->get('info*');
-	$this->ans['info'] = array_intersect_key($info, array_flip(Pay::$infoprops));
+	extract($this->gets(['order*','user*', 'status']), EXTR_REFS);
+	$this->ans['user'] = $user;
+	if (!empty($order['paydata']['result'])) {
+		//Успешную оплату больше не перепроверяем
+		$this->ans['info'] = $order['paydata'];
+		return $this->ret();
+	}
+	extract($this->gets(['info*'])); //При вызове info информация сохраняется в paydata	
+	$this->ans['info'] = Pay::safePayData($info);
+
+	if ($status == 'error') {
+		return $this->get('error', [
+			'info' => $info,
+			'code'=>'bankerror'
+		]);
+	}
+
+	if (!$info['result']) return $this->fail('error','pay');
+	
+	if ($order['status'] == 'pay') {	
+		$r = Cart::setStatus($order['order_id'], 'check');
+		if (!$r) return $this->get('error', [
+			'info' => $info,
+			'code'=>'dbfail'
+		]);
+		$r = Pay::mail($order);
+		if (!$r) return $this->fail('nomail');
+	}
 	return $this->ret();
 });
 $meta->addAction('pay', function () {
 	return $this->get('pay-'.Pay::$conf['bank']);
 });
 
-// $meta->addAction('layer.json', function () {
-// 	echo '<pre>';
-// 	exit;
-// 	$src = '-pay/'.Pay::$conf['bank'].'/layer.json';
-// 	$layer = Load::loadJSON($src);
-// 	$this->ans = $layer;
-// });
-
-
-
-
-
 
 $meta->addVariable('info*', function () {
-	$info = $this->get('info-'.Pay::$conf['bank']);
+	extract($this->gets(['info-'.Pay::$conf['bank'],'order*']), EXTR_REFS);
+	$r = Pay::savePayData($order['order_id'], $info);
+	if (!$r) return $this->fail('error','info');
 	return $info;
 });
 $meta->addFunction('error', function ($obj) {
@@ -104,36 +130,12 @@ $meta->addFunction('error', function ($obj) {
 
 
 
-$meta->addFunction('orderfrominfo', function () {
-	extract($this->gets(['info*']));
-	$order_nick = $info['order_nick'];
-	$order = Cart::getByNick($order_nick);
-	if (!$order) return $this->fail('order404');
-
-	$r = Pay::savePayData($order['order_id'], $info);
-	if (!$r) return $this->get('error', [
-		'info' => $info,
-		'code'=>'dbfail'
-	]);
-	return $order;
-});
 
 $meta->addFunction('info-sbrfpay', function () {
-	extract($this->gets(['orderid']));	
+	extract($this->gets(['orderid','order*']));	
 	$info = Sbrfpay::getInfo($orderid);  //'total','orderId','formUrl','date'
-
 	if (!$info) return $this->fail('erconnect');
-
-	$order_nick = $info['orderNumber'];
-	$order = Cart::getByNick($order_nick);
-	if (!$order) return $this->fail('order404');
-	$r = Pay::savePayData($order['order_id'], $info);
-	
-	if (!$r) return $this->get('error', [
-		'info' => $info,
-		'code'=>'dbfail'
-	]);
-
+	if ($info['order_nick'] != $order['order_nick']) return $this->fail('order404');
 	return $info;
 });
 $meta->addFunction('info-paykeeper', function () {
@@ -155,9 +157,7 @@ $meta->addFunction('info-paykeeper', function () {
 $meta->addFunction('pay-sbrfpay', function () {
 	extract($this->gets(['user*','order*']));
 
-	if ($order['paydata']) {
-		if (empty($order['paydata'])) return $this->fail('error', 1);
-		if (empty($order['paydata']['formUrl'])) return $this->fail('error', 2);
+	if (!empty($order['paydata']['result']) {
 		$info = $order['paydata'];
 	} else {
 		$info = Sbrfpay::getId($order['order_nick'], $order['total']);
@@ -166,9 +166,6 @@ $meta->addFunction('pay-sbrfpay', function () {
 			'code' => $info['errorMessage']
 		]);
 		
-		// $order['sbrfpay'] = [];
-		// $order['sbrfpay']['orderId'] = $ans['orderId'];
-		// $order['sbrfpay']['formUrl'] = $ans['formUrl'];
 		$r = Pay::savePayData($order['order_id'], $info);
 		if (!$r) return $this->get('error', [
 			'info' => $info,
