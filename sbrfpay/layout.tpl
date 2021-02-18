@@ -4,5 +4,5 @@
 		<img class="img-fluid my-3" src="/vendor/akiyatkin/pay/sbrfpay/cards.png">
 	</center>
 	<p>
-		Ознакомьтесь с информацией <a href="/company">о компании</a>, <a href="/contacts">контакты и реквизиты</a>, <a href="/guaranty">гарантийные условия</a>, <a href="/terms">политика конфиденциальности</a>, <a href="/return">возврат и обмен</a>.
+		Ознакомьтесь с информацией <a href="/company">о компании</a>, <a href="/contacts">контакты и реквизиты</a>, <a href="/guaranty">гарантийные условия</a>, <a href="/terms">политика конфиденциальности</a>, <a href="/return">возврат и обмен</a>, <a href="/pay">способы оплаты</a>.
 	</p>
