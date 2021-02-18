@@ -1,4 +1,5 @@
 {
+	"pub":["bank"],
 	"conf":"akiyatkin\\pay\\Pay",
 	"bank":"sbrfpay",
 	"lang":{
@@ -15,5 +16,8 @@
 		"userName":"",
 		"password":"",
 		"server":"demo.server.paykeeper.ru"
+	},
+	"clutch":{
+		"cart":"vendor/akiyatkin/pay/"
 	}
 }

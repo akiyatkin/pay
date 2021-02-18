@@ -4,20 +4,30 @@ use infrajs\lang\LangAns;
 use infrajs\db\Db;
 use infrajs\cart\Cart;
 use infrajs\cache\CacheOnce;
+use infrajs\user\User;
 
 class Pay {
-	public static $infoprops = ['total','orderId','formUrl','date','order_nick','result','description','error'];
+	public static $infoprops = ['total','orderId','date','order_nick','result','description','error','formUrl'];
 	public static $conf = [];
 	public static $name = 'pay';
 	use CacheOnce;
 	use LangAns;
 	public static function safePayData($paydata) {
-		if (is_string($paydata)) $paydata = json_decode($paydata, true);
-		return array_intersect_key($paydata, array_flip(Pay::$infoprops));
+		$info = array_intersect_key($paydata, array_flip(Pay::$infoprops));
+		if (empty($info['error'])) $info['error'] = '';
+		return $info;
+	}
+	public static function setPaid($order_id) {
+		return Db::exec('UPDATE cart_orders
+		 	SET paid = 1
+			WHERE order_id = :order_id
+		', [
+		 	':order_id' => $order_id
+		]) !== false;
 	}
 	public static function savePayData($order_id, $paydata) {
 		return Db::exec('UPDATE cart_orders
-		 	SET paydata = :paydata, paid = 1, dateedit = now()
+		 	SET paydata = :paydata, dateedit = now()
 			WHERE order_id = :order_id
 		', [
 		 	':order_id' => $order_id,

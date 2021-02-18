@@ -17,7 +17,7 @@ $order_nick = $order['order_nick'];
 $link = Paykeeper::getLink($order_nick, $order['total'], $order['email'], $order['phone'], $order['name']);
 if (!$link) return Ans::err($ans, 'Ошибка соединения. Код PK108');
 
-$ans['formURL'] = $link;
+$ans['formUrl'] = $link;
 // $r = Db::exec('UPDATE cart_orders
 // 	SET paydata = :paydata, dateedit = now()
 // 	WHERE order_id = :order_id

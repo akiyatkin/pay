@@ -58,10 +58,10 @@ class Sbrfpay {
 		$vars['amount'] = $amount * 100;
 
 		/* URL куда клиент вернется в случае успешной оплаты */
-		$vars['returnUrl'] = View::getPath().'cart/orders/'.$id.'/sbrfpay/success';
+		$vars['returnUrl'] = View::getPath().'cart/orders/'.$id.'/pay/success';
 			
 		/* URL куда клиент вернется в случае ошибки */
-		$vars['failUrl'] = View::getPath().'cart/orders/'.$id.'/sbrfpay/error';
+		$vars['failUrl'] = View::getPath().'cart/orders/'.$id.'/pay/error';
 		 
 		/* Описание заказа, не более 24 символов, запрещены % + \r \n */
 		$vars['description'] = 'Заказ №' . $id . ' на '.View::getHost();
@@ -74,7 +74,11 @@ class Sbrfpay {
 		$res = Sbrfpay::request('/payment/rest/register.do', $vars);
 		return $res;
 	}
-	
+
+	public static function checkInfo($info) {
+
+		
+	}
 	public static function getInfo ($orderId) {
 		$vars = array();
 		$vars['orderId'] = $orderId;
@@ -82,23 +86,25 @@ class Sbrfpay {
 		if ($info) {
 			$info['orderId'] = $orderId;
 		}
-		if (isset($info['terminalId'])) {
-			$info['formUrl'] = 'https://3dsec.sberbank.ru/payment/merchants/'.$info['terminalId'].'/payment_ru.html?mdOrder='.$orderId;	
-		}
+		// if (empty($info['formUrl'])) {
+		// 	if (isset($info['terminalId'])) {
+		// 		$info['formUrl'] = 'https://3dsec.sberbank.ru/payment/merchants/'.$info['terminalId'].'/payment_ru.html?mdOrder='.$orderId;	
+		// 	}
+		// }
 		if (isset($info['orderNumber'])) $info['order_nick'] = $info['orderNumber'];
 		if (isset($info['orderDescription'])) $info['description'] = $info['orderDescription'];
 		
-		if ($info['orderStatus'] == 2) $info['result'] = 1;
+		if (isset($info['orderStatus']) && $info['orderStatus'] == 2) $info['result'] = 1;
 		else $info['result'] = 0;
 
-		//actionCodeDescription
 		$info['error'] = '';
 		if (!empty($info['errorCode'])) {
-			$info['error'] =$info['errorMessage'];
+			$info['error'] = $info['errorMessage'];
+		} else if (isset($info['actionCodeDescription'])) {
+			$info['error'] = $info['actionCodeDescription'];	
 		}
-
-		$testres = array_intersect_key($info, array_flip(Pay::$infoprops));
-		if (sizeof($testres) != sizeof(Pay::$infoprops)) return false;
+		//$testres = Pay::safePayData($info);
+		//if (sizeof($testres) != sizeof(Pay::$infoprops) - 1) return false; //Кроме formUrl
 		return $info;
 	}
 	public static function request ($src, $vars = []) {
