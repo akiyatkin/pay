@@ -2,4 +2,4 @@
 {sbrf::}-pay/{~conf.pay.bank}/layout.tpl
 {PAYINFO:}{:sbrf.DESCR}
 {pay::}-pay/cartapi/layout.tpl
-{paylayout:}{:pay.INFO}
+{PAYLAYOUT:}{:pay.INFO}
