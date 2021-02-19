@@ -36,7 +36,7 @@
 		<a href="/cart/orders/{data.id}/list">Корзина</a>
 	</p> -->
 {INFO:}
-	{result?:good?(error?:bad)?:nothing}
+	{result?:good?(error?:bad?:nothing)}
 	{nothing:}
 	{bad:}
 		<p>Не оплачен</p>
