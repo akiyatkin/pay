@@ -92,8 +92,6 @@ $meta->addAction('getinfo', function () {
 			if (!$r) return $this->get('error', ['info' => $info, 'code'=>'dbfail', 'payload' => 'status' ]);
 			$r = Pay::setPaid($order['order_id']);
 			if (!$r) return $this->get('error', ['info' => $info, 'code'=>'dbfail', 'payload' => 'paid' ]);
-			$r = Cart::freeze($order['order_id']);
-			if (!$r) return $this->get('error', ['info' => $info, 'code'=>'dbfail', 'payload' => 'freeze' ]);
 			$r = Pay::mail($order['order_id']);
 			if (!$r) return $this->fail('nomail');
 		}

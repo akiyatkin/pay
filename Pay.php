@@ -19,7 +19,7 @@ class Pay {
 	}
 	public static function setPaid($order_id) {
 		return Db::exec('UPDATE cart_orders
-		 	SET paid = 1
+		 	SET paid = 1, datepaid = now()
 			WHERE order_id = :order_id
 		', [
 		 	':order_id' => $order_id
