@@ -35,7 +35,7 @@ class Paykeeper
 	}
 	public static function getLink($orderid, $amount, $email, $phone, $fio)
 	{
-		$conf = Config::get('cart');
+		$conf = Config::get('pay');
 		$conf = $conf['paykeeper'];
 
 
