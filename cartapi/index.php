@@ -11,6 +11,7 @@ use akiyatkin\fs\FS;
 use akiyatkin\pay\sbrfpay\Sbrfpay;
 use akiyatkin\pay\paykeeper\Paykeeper;
 
+header('Cache-Control: no-store');
 
 $meta = new Meta();
 
@@ -87,7 +88,7 @@ $meta->addAction('getinfo', function () {
 	}
 
 	if ($info['result']) {
-		if ($order['status'] == 'pay') {	
+		if ($order['status'] == 'pay') {
 			$r = Cart::setStatus($order['order_id'], 'check');
 			if (!$r) return $this->get('error', ['info' => $info, 'code'=>'dbfail', 'payload' => 'status' ]);
 			$r = Pay::setPaid($order['order_id']);
@@ -166,7 +167,6 @@ $meta->addFunction('info#sbrfpay', function () {
 
 	$r = Pay::savePayData($order['order_id'], $info);
 	if (!$r) return $this->fail('error','info');
-
 	return $info;
 });
 
@@ -175,13 +175,15 @@ $meta->addFunction('info#sbrfpay', function () {
 
 
 $meta->addFunction('info#paykeeper', function () {
+	//paykeeper работает через оповещения на callback
+	//-pay/paykeeper/callback.php
 	return $this->fail();
 });
 $meta->addFunction('pay#paykeeper', function () {
 	extract($this->gets(['user','order']));
-	$link = Paykeeper::getLink($order['order_nick'], $order['total'], $order['email'], $order['phone'], $order['name']);
-	if (!$link) return $this->fail('erconnect', 2);
-	$this->ans['formUrl'] = $link;
+	$info = Paykeeper::getId($order['order_nick'], $order['total'], $order['email'], $order['phone'], $order['name']);
+	if (!$info) return $this::get('error', [ 'code' => 'erconnect', 'payload' => 'pay']);
+	$this->ans['info'] = Pay::safePayData($info);
 	return $this->ret();
 });
 

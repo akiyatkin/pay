@@ -33,7 +33,7 @@ class Paykeeper
 		$r2 = Cart::mail($user, $user['lang'], 'orderToCheck');
 		return $r1 && $r2;
 	}
-	public static function getLink($orderid, $amount, $email, $phone, $fio)
+	public static function getId($order_nick, $amount, $email, $phone, $fio)
 	{
 		$conf = Config::get('pay');
 		$conf = $conf['paykeeper'];
@@ -56,7 +56,7 @@ class Paykeeper
 		$payment_data = array(
 			"pay_amount" => number_format($amount, 2, '.', ''),
 			"clientid" => $fio . ' (' . $email . ')',
-			"orderid" => $orderid,
+			"orderid" => $order_nick,
 			"client_email" => $email,
 			"service_name" => "Заказ",
 			"client_phone" => $phone
@@ -73,6 +73,9 @@ class Paykeeper
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
 		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($curl, CURLOPT_HEADER, false);
+		
+		//wtf
+		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
 
 		# Инициируем запрос к API
 		$response = curl_exec($curl);
@@ -95,7 +98,6 @@ class Paykeeper
 		curl_setopt($curl, CURLOPT_HEADER, false);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, $request);
 
-
 		$response = json_decode(curl_exec($curl), true);
 		# В ответе должно быть поле invoice_id, иначе - ошибка
 		if (isset($response['invoice_id'])) $invoice_id = $response['invoice_id'];
@@ -103,8 +105,13 @@ class Paykeeper
 
 		# В этой переменной прямая ссылка на оплату с заданными параметрами
 		$link = "http://$server/bill/$invoice_id/";
-
+		$info = [
+			'order_nick' => $order_nick,
+			'amount' => $amount,
+			'orderId' => $token, 
+			'formUrl' => $link
+		];
 		# Теперь её можно использовать как угодно, например, выводим ссылку на оплату
-		return $link;
+		return $info;
 	}
 }

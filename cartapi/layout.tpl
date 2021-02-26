@@ -3,6 +3,7 @@
 {root:}
 	{(:Онлайн оплата):utilcrumb}
 	<h1>Онлайн оплата</h1>
+	{~print(data)}
 	{data.msg?data:ans.msg}
 	{data.info:INFO}
 	{data.info.result??(data.info.formUrl?:redirect)}

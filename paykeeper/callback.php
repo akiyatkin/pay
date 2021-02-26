@@ -1,24 +1,22 @@
 <?php
 
 use infrajs\ans\Ans;
-use infrajs\cart\paykeeper\Paykeeper;
-use infrajs\nostore\Nostore;
-use infrajs\config\Config;
+use akiyatkin\pay\paykeeper\Paykeeper;
 use infrajs\cart\Cart;
 use infrajs\user\User;
 use infrajs\load\Load;
+use akiyatkin\pay\Pay;
 use infrajs\db\Db;
 
-Nostore::on();
+header('Cache-Control: no-store');
 
 $ans = array();
 
 $info = $_REQUEST;
-$conf = Config::get('cart');
-$conf = $conf['paykeeper'];
+$conf = Pay::$conf['paykeeper'];
 $secret = $conf['secret'];
 
-$ans['info'] = $info;
+$ans['info'] = &$info;
 foreach(['id','sum','clientid','orderid','key'] as $k) {
 	if (empty($info[$k])) return Paykeeper::err($ans, 'Недостаточно данных. Код c'.__LINE__);
 }
@@ -43,32 +41,27 @@ $amount = $order['total'];
 //echo $amount;
 if (number_format($sum, 2,'.','') != number_format($amount, 2,'.','')) return Paykeeper::err($ans, 'Ошибка с суммой заказа. Код c'.__LINE__);
 
-//if ($order['status'] != "pay") return Paykeeper::err($ans, 'Ошибка инициации оплаты. Код c'.__LINE__);
-$paydata = $info;
+$info['total'] = $order['total'];
+$info['orderId'] = $info['id'];
+$info['date'] = time();
+$info['order_nick'] = $orderid;
+$info['result'] = 1;
+// ['total','orderId','date','order_nick','result','description','error','formUrl'];
 
-$r = Db::exec('UPDATE cart_orders
- 	SET paydata = :paydata, paid = 1, dateedit = now()
-	WHERE order_id = :order_id
-', [
- 	':order_id' => $order['order_id'],
- 	':paydata' => json_encode($paydata, JSON_UNESCAPED_UNICODE)
-]) !== false;
+
+$r = Pay::savePayData($order['order_id'], $info); //Сохраняем и ошибку
 if (!$r) return Paykeeper::err($ans, 'Неудалось сохранить ответ. Код c'.__LINE__);
 
 
+if ($order['status'] != 'pay') return Paykeeper::err($ans, 'Нельзя выполнить это действие с заказом в текущем статусе. Код c'.__LINE__);
+
 $r = Cart::setStatus($order['order_id'], 'check');
 if (!$r) return Paykeeper::err($ans, 'Неудалось изменить статус заказа. Код c'.__LINE__);
-$ouser = User::getByEmail($order['email']);
-$worder = Cart::getWaitOrder($ouser);
-if ($worder) Cart::setActive($worder['order_id'], $ouser['user_id']);
-
-Cart::$once = [];
-$order = Cart::getByNick($orderid);
-$r = Paykeeper::mail($order);
+$r = Pay::setPaid($order['order_id']);
+if (!$r) return Paykeeper::err($ans, 'Ошибка базы данных. Код c'.__LINE__);
+$r = Pay::mail($order['order_id']);
 if (!$r) return Paykeeper::err($ans, 'Неудалось отправить оповещение. Код c'.__LINE__);
-$ans['result'] = 1;
-$ans['msg'] = "OK " . md5($paymentid . $secret);
-		
 
-if ($ans['result']) echo $ans['msg'];
-else return Ans::ans($ans);
+
+echo "OK " . md5($paymentid . $secret);
+
