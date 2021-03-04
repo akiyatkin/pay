@@ -1,5 +1,5 @@
 {::}vendor/infrajs/cart/layout.tpl
-{sbrf::}-pay/{~conf.pay.bank}/layout.tpl
-{PAYINFO:}{:sbrf.DESCR}
+{bank::}-pay/{~conf.pay.bank}/layout.tpl
+{PAYINFO:}{:bank.DESCR}
 {pay::}-pay/cartapi/layout.tpl
 {PAYLAYOUT:}{:pay.INFO}
