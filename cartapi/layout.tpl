@@ -1,5 +1,5 @@
-{ans::}-ans/ans.tpl
-{model::}-catalog/model.tpl
+{ans::}-ans/ans.tpl?v={~conf.index.v}
+{model::}-catalog/model.tpl?v={~conf.index.v}
 {root:}
 	{(:Онлайн оплата):utilcrumb}
 	<h1>Онлайн оплата</h1>

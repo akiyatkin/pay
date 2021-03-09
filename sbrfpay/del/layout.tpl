@@ -29,13 +29,13 @@
 	<script>
 		location.replace("{data.formUrl}")
 	</script>
-{ans::}-ans/ans.tpl
+{ans::}-ans/ans.tpl?v={~conf.index.v}
 {links:}
 	<!-- <p>
 		<a href="/cart/orders/{data.id}">Данные заказа</a><br>
 		<a href="/cart/orders/{data.id}/list">Корзина</a>
 	</p> -->
-{model::}-catalog/model.tpl
+{model::}-catalog/model.tpl?v={~conf.index.v}
 {INFO:}
 	{info:showinfo}
 	{showinfo:}

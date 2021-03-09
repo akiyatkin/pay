@@ -1,5 +1,5 @@
-{ans::}-ans/ans.tpl
-{model::}-catalog/model.tpl
+{ans::}-ans/ans.tpl?v={~conf.index.v}
+{model::}-catalog/model.tpl?v={~conf.index.v}
 {ordernick:}№{data.order.order_nick}
 {root:}
 	{(:Онлайн оплата):utilcrumb}
