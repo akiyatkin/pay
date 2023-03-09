@@ -104,7 +104,7 @@ class Paykeeper
 		else return false;
 
 		# В этой переменной прямая ссылка на оплату с заданными параметрами
-		$link = "http://$server/bill/$invoice_id/";
+		$link = "$server/bill/$invoice_id/";
 		$info = [
 			'order_nick' => $order_nick,
 			'amount' => $amount,

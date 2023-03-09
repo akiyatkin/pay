@@ -15,7 +15,7 @@
 		"secret":"",
 		"userName":"",
 		"password":"",
-		"server":"demo.server.paykeeper.ru"
+		"server":"https://demo.server.paykeeper.ru"
 	},
 	"clutch":{
 		"cart":"vendor/akiyatkin/pay/"
